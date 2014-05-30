@@ -1,7 +1,8 @@
 Index: include/gtest/internal/gtest-port.h
 ===================================================================
---- include/gtest/internal/gtest-port.h	(リビジョン 686)
-+++ include/gtest/internal/gtest-port.h	(作業コピー)
+diff --git a/trunk/include/gtest/internal/gtest-port.h b/trunk/include/gtest/internal/gtest-port.h
+--- a/trunk/include/gtest/internal/gtest-port.h	(リビジョン 686)
++++ b/trunk/include/gtest/internal/gtest-port.h	(作業コピー)
 @@ -256,11 +256,16 @@
  //   Int32FromGTestEnv()  - parses an Int32 environment variable.
  //   StringFromGTestEnv() - parses a string environment variable.
@@ -22,8 +23,9 @@ Index: include/gtest/internal/gtest-port.h
  # include <sys/stat.h>
 Index: src/gtest-internal-inl.h
 ===================================================================
---- src/gtest-internal-inl.h	(リビジョン 686)
-+++ src/gtest-internal-inl.h	(作業コピー)
+diff --git a/trunk/src/gtest-internal-inl.h b/trunk/src/gtest-internal-inl.h
+--- a/trunk/src/gtest-internal-inl.h	(リビジョン 686)
++++ b/trunk/src/gtest-internal-inl.h	(作業コピー)
 @@ -245,6 +245,7 @@
  // and contains invalid UTF-16 surrogate pairs, values in those pairs
  // will be encoded as individual Unicode characters from Basic Normal Plane.
@@ -34,9 +36,10 @@ Index: src/gtest-internal-inl.h
  // if the variable is present. If a file already exists at this location, this
 Index: src/gtest.cc
 ===================================================================
---- src/gtest.cc	(リビジョン 686)
-+++ src/gtest.cc	(作業コピー)
-@@ -1518,6 +1518,26 @@
+diff --git a/trunk/src/gtest.cc b/trunk/src/gtest.cc
+--- a/trunk/src/gtest.cc	(リビジョン 686)
++++ b/trunk/src/gtest.cc	(作業コピー)
+@@ -1518,7 +1518,27 @@
    }
    return StringStreamToString(&stream);
  }
@@ -63,6 +66,7 @@ Index: src/gtest.cc
  
  // Converts a wide C string to an std::string using the UTF-8 encoding.
  // NULL will be converted to "(null)".
+ std::string String::ShowWideCString(const wchar_t * wide_c_str) {
 @@ -3026,7 +3046,8 @@
  
    // May c appear in a well-formed XML document?
@@ -93,7 +97,7 @@ Index: src/gtest.cc
  
    for (size_t i = 0; i < str.size(); ++i) {
      const char ch = str[i];
-@@ -3316,7 +3338,9 @@
+@@ -3316,11 +3338,17 @@
                << EscapeXmlAttribute(summary.c_str())
                << "\" type=\"\">";
        const string detail = location + "\n" + part.message();
@@ -104,10 +108,20 @@ Index: src/gtest.cc
        *stream << "</failure>\n";
      }
    }
+-
++  // skip
++  if( !test_info.should_run() && failures == 0 ) {
++  	*stream << ">\n      <skipped />\n    </testcase>\n";
++    return;
++  }
+   if (failures == 0)
+     *stream << " />\n";
+   else
 Index: src/gtest_main.cc
 ===================================================================
---- src/gtest_main.cc	(リビジョン 686)
-+++ src/gtest_main.cc	(作業コピー)
+diff --git a/trunk/src/gtest_main.cc b/trunk/src/gtest_main.cc
+--- a/trunk/src/gtest_main.cc	(リビジョン 686)
++++ b/trunk/src/gtest_main.cc	(作業コピー)
 @@ -27,7 +27,11 @@
  // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  // OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
